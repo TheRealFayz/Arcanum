@@ -17,7 +17,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
 							<Offset>
-								<AbsDimension x="30" y="-55"/>
+								<AbsDimension x="30" y="-25"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -27,7 +27,27 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
 							<Offset>
-								<AbsDimension x="60" y="-75"/>
+								<AbsDimension x="60" y="-45"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ArcanumHideInCombat_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-65"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ArcanumOrangesMessage_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-110"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -135,51 +155,6 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Slider name="ArcanumLanguage_Slider" inherits="OptionsSliderTemplate" minValue="1" maxValue="3" valueStep="1" virtual="true">
-				<Size>
-					<AbsDimension x="150" y="16"/>
-				</Size>
-				<Anchors>
-					<Anchor point="CENTER" relativeTo="ArcanumMessageMenu" relativeFrom="TOP">
-						<Offset>
-							<AbsDimension x="0" y="180"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						if (this:GetValue() == 1) then
-							GameTooltip:SetText(Arcanum_ColoredMsg("Francais"));
-						elseif (this:GetValue() == 2) then
-							GameTooltip:SetText(Arcanum_ColoredMsg("English"));
-						else
-							GameTooltip:SetText(Arcanum_ColoredMsg("Deutsch"));
-						end
-					</OnEnter>
-					<OnValueChanged>
-						GameTooltip:SetText(this:GetValue());
-						if (this:GetValue() == 1) then
-							GameTooltip:SetText(Arcanum_ColoredMsg("Francais"));
-							ArcanumConfig.ArcanumLanguage = "frFR";
-							Arcanum_Localization_Dialog_Fr();
-						elseif (this:GetValue() == 2) then
-							GameTooltip:SetText(Arcanum_ColoredMsg("English"));
-							ArcanumConfig.ArcanumLanguage = "enUS";
-							Arcanum_Localization_Dialog_En();
-						else
-							GameTooltip:SetText(Arcanum_ColoredMsg("Deutsch"));
-							ArcanumConfig.ArcanumLanguage = "deDE";
-							Arcanum_Localization_Dialog_De();
-						end
-						Arcanum_LanguageInitialize();
-					</OnValueChanged>
-					<OnLeave>
-						GameTooltip:Hide();
-					</OnLeave>
-				</Scripts>
-			</Slider>
-				
 			<CheckButton name="ArcanumChatType_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
 				<Size>
 					<AbsDimension x="24" y="24"/>
@@ -187,7 +162,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
 						<Offset>
-							<AbsDimension x="30" y="-70"/>
+							<AbsDimension x="30" y="-40"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -201,43 +176,48 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			<Slider name="ArcanumTooltip_Slider" inherits="OptionsSliderTemplate" minValue="0" maxValue="2" valueStep="1" virtual="true">
+			<CheckButton name="ArcanumHideInCombat_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
 				<Size>
-					<AbsDimension x="150" y="16"/>
+					<AbsDimension x="24" y="24"/>
 				</Size>
 				<Anchors>
-					<Anchor point="CENTER" relativeTo="ArcanumMessageMenu" relativeFrom="TOP">
+					<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
 						<Offset>
-							<AbsDimension x="0" y="110"/>
+							<AbsDimension x="30" y="-60"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						if this:GetValue() == 0 then
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip0));
-						elseif this:GetValue() == 1 then
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip1));
+					<OnClick>
+						if (this:GetChecked()) then
+							ArcanumConfig.HideInCombat = true;
 						else
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip2));
+							ArcanumConfig.HideInCombat = false;
 						end
-					</OnEnter>
-					<OnValueChanged>
-						if this:GetValue() == 0 then
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip0));
-						elseif this:GetValue() == 1 then
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip1));
-						else
-							GameTooltip:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Tooltip2));
-						end
-						ArcanumConfig.Tooltip = this:GetValue();
-					</OnValueChanged>
-					<OnLeave>
-						GameTooltip:Hide();
-					</OnLeave>
+					</OnClick>
 				</Scripts>
-			</Slider>
+			</CheckButton>
+			<CheckButton name="ArcanumOrangesMessage_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ArcanumMessageMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							ArcanumConfig.OrangesMessage = true;
+						else
+							ArcanumConfig.OrangesMessage = false;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
 			<CheckButton name="ArcanumPortalMessage_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
 				<Size>
 					<AbsDimension x="24" y="24"/>

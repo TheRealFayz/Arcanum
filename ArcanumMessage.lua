@@ -170,26 +170,11 @@ function Arcanum_MsgReplace(msg, dest)
         msg = string.gsub(msg, "<me2>", "she");
     end
 	if dest then
-		if dest == 1 then
-			msg = string.gsub(msg, "<1>", Dest[2]);
-			msg = string.gsub(msg, "<2>", Dest[3]);
-		elseif dest == 2 then
-			msg = string.gsub(msg, "<1>", Dest[3]);
-			msg = string.gsub(msg, "<2>", Dest[1]);
-		elseif dest == 3 then
-			msg = string.gsub(msg, "<1>", Dest[1]);
-			msg = string.gsub(msg, "<2>", Dest[2]);
-		elseif dest == 4 then
-			msg = string.gsub(msg, "<1>", Dest[5]);
-			msg = string.gsub(msg, "<2>", Dest[6]);
-		elseif dest == 5 then
-			msg = string.gsub(msg, "<1>", Dest[6]);
-			msg = string.gsub(msg, "<2>", Dest[4]);
-		elseif dest == 6 then
-			msg = string.gsub(msg, "<1>", Dest[4]);
-			msg = string.gsub(msg, "<2>", Dest[5]);
+		if ArcanumConfig.IsAlliance then
+			msg = string.gsub(msg, "<city>", ALLIANCE_DEST[dest]);
+		else
+			msg = string.gsub(msg, "<city>", HORDE_DEST[dest]);
 		end
-		msg = string.gsub(msg, "<city>", Dest[dest]);
 	end
 	return msg;
 end

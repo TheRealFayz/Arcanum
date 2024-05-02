@@ -72,16 +72,6 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="ArcanumMountButton_Option" inherits="GameFontNormalSmall">
-					<Color r="1.0" g="1.0" b="1.0" a="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="ArcanumButtonOptionMenu" relativeFrom="TOPLEFT">
-							<Offset>
-								<AbsDimension x="60" y="-120"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
 				<FontString name="ArcanumFoodButton_Option" inherits="GameFontNormalSmall">
 					<Color r="1.0" g="1.0" b="1.0" a="1"/>
 					<Anchors>
@@ -217,29 +207,6 @@
                             HideUIPanel(ArcanumButton8);
                             HideUIPanel(ArcanumButton9);
                             HideUIPanel(ArcanumButton10);
-						end
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-			<CheckButton name="ArcanumMountButton_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
-				<Size>
-					<AbsDimension x="24" y="24"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="ArcanumButtonOptionMenu" relativeFrom="TOPLEFT">
-						<Offset>
-							<AbsDimension x="30" y="-115"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						if (this:GetChecked()) then
-							ArcanumConfig.MountButton = true;
-                            ShowUIPanel(ArcanumButton7);
-						else
-							ArcanumConfig.MountButton = false;
-                            HideUIPanel(ArcanumButton7);
 						end
 					</OnClick>
 				</Scripts>

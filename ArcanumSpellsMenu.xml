@@ -22,37 +22,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-                <FontString name="ArcanumConsumeLeftFood_Option" inherits="GameFontNormalSmall">
-					<Color r="1.0" g="1.0" b="1.0" a="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-							<Offset>
-								<AbsDimension x="60" y="-130"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="ArcanumConsumeRightFood_Option" inherits="GameFontNormalSmall">
-					<Color r="1.0" g="1.0" b="1.0" a="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-							<Offset>
-								<AbsDimension x="60" y="-150"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-                <FontString name="ArcanumRandMount_Option" inherits="GameFontNormalSmall">
-					<Color r="1.0" g="1.0" b="1.0" a="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-							<Offset>
-								<AbsDimension x="60" y="-190"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-            </Layer>	
+            </Layer>
 		</Layers>
 		<Frames>
             <Slider name="ArcanumEvocationLimit_Slider" inherits="OptionsSliderTemplate" minValue="0" maxValue="100" valueStep="10" virtual="true">
@@ -97,73 +67,6 @@
 							ArcanumConfig.LevelBuff = true;
 						else
 							ArcanumConfig.LevelBuff = false;
-						end
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-            <CheckButton name="ArcanumConsumeLeftFood_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
-				<Size>
-					<AbsDimension x="24" y="24"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-						<Offset>
-							<AbsDimension x="30" y="-125"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-                        if (this:GetChecked()) then
-							ArcanumConfig.ConsumeFood = "Left";
-							ArcanumConsumeRightFood_Button:SetChecked(0);
-                        else
-							ArcanumConfig.ConsumeFood = "Right";
-							ArcanumConsumeRightFood_Button:SetChecked(1);
-                           end
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-			<CheckButton name="ArcanumConsumeRightFood_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
-				<Size>
-					<AbsDimension x="24" y="24"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-						<Offset>
-							<AbsDimension x="30" y="-145"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-                        if (this:GetChecked()) then
-							ArcanumConfig.ConsumeFood = "Right";
-							ArcanumConsumeLeftFood_Button:SetChecked(0);
-						else
-							ArcanumConfig.ConsumeFood = "Left";
-							ArcanumConsumeLeftFood_Button:SetChecked(1);
-						end
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-            <CheckButton name="ArcanumRandMount_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
-				<Size>
-					<AbsDimension x="24" y="24"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="ArcanumSpellsMenu" relativeFrom="TOPLEFT">
-						<Offset>
-							<AbsDimension x="30" y="-185"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-                        if (this:GetChecked()) then
-							ArcanumConfig.RandMount = true;
-						else
-                        	ArcanumConfig.RandMount = false;
 						end
 					</OnClick>
 				</Scripts>

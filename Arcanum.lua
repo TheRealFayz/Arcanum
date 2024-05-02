@@ -1637,6 +1637,7 @@ function Arcanum_Slash(msg)
 		end
 	else
 		if isHidden then
+			hiddenByUser = false;
 			Arcanum_Initialize();
 		else
 			hiddenByUser = true;

@@ -148,8 +148,8 @@ function Arcanum_Localization_Dialog_En()
 	-- Message
 	ARCANUM_MESSAGE = {
 		["Interface"] = {
-			["InitOn"] = "<white>activated. /arcanum or /arca to show the window, /arca options to show the configuration",
-			["InitOff"] = "<white>deactivated. /arca",
+			["InitOn"] = "<white>activated. /arcanum or /arca to show/hide the window, /arca options to show options",
+			["InitOff"] = "<white>deactivated. /arca to show again",
 			["DefaultConfig"] = "<lightYellow>Default configuration loaded.",
 			["UserConfig"] = "<lightYellow>Configuration loaded."
 		},

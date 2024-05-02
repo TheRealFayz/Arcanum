@@ -103,6 +103,8 @@ Default_ArcanumConfig = {
 }
 
 local isHidden = false;
+local hiddenByUser = false;
+local firstLoad = true;
 
 -- Variables utilisés pour la gestion des composants
 -- (principalement comptage)
@@ -310,11 +312,9 @@ function Arcanum_Initialize()
 			ArcanumConfig = {};
 			ArcanumConfig = Default_ArcanumConfig;
 			Arcanum_Localization_Dialog_En();
-			Arcanum_Msg(ARCANUM_MESSAGE.Interface.DefaultConfig, "USER");
 			ArcanumButton:ClearAllPoints();
 		else
 			Arcanum_Localization_Dialog_En();
-			Arcanum_Msg(ARCANUM_MESSAGE.Interface.UserConfig, "USER");
 		end
 
 		ArcanumConfig.IsAlliance = (englishFaction == "Alliance");
@@ -358,8 +358,9 @@ function Arcanum_Initialize()
 		if ArcanumConfig.Toggle == false then
 			Arcanum_HideUI();
 			Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOff, "USER");
-		else
+		elseif firstLoad then
 			Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOn, "USER");
+			firstLoad = false;
 		end
 	else
 		ArcanumConfig = {};
@@ -1638,6 +1639,7 @@ function Arcanum_Slash(msg)
 		if isHidden then
 			Arcanum_Initialize();
 		else
+			hiddenByUser = true;
 			Arcanum_HideUI();
 		end
 	end
@@ -2066,6 +2068,10 @@ function Arcanum_CombatDisableIcons()
 end
 
 function Arcanum_CombatEnableIcons()
+	if hiddenByUser then
+		return ;
+	end
+
 	if ArcanumConfig.HideInCombat then
 		Arcanum_Initialize();
 	else

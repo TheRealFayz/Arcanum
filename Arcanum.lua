@@ -720,6 +720,9 @@ function Arcanum_LoadConfig()
 	if (ArcanumConfig.ChatType) then
 		ArcanumChatType_Button:SetChecked(1);
 	end
+	if (ArcanumConfig.HideInCombat) then
+		ArcanumHideInCombat_Button:SetChecked(1);
+	end
 	if (ArcanumConfig.OrangesMessage) then
 		ArcanumOrangesMessage_Button:SetChecked(1);
 	end

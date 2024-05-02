@@ -1441,7 +1441,7 @@ function Arcanum_UseItem(type, button)
 					for i = ARCANUM_SPELL_TABLE.Rank[8], 1, -1 do
 						if UnitLevel("target") >= Water_Minlvl[i] then
 							local FoodName = ARCANUM_SPELL_TABLE.Name[8] .. "(" .. ARCANUM_TRANSLATION.Rank .. " " .. i .. ")";
-							CastSpellByName(FoodName, "spell");
+							CastSpellByName(FoodName);
 							break ;
 						end
 					end

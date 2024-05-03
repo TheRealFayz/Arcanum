@@ -494,7 +494,6 @@ function Arcanum_OnEvent(event)
 	elseif (event == "LEARNED_SPELL_IN_TAB") then
 		Arcanum_SpellSetup();
 		Arcanum_ButtonSetup();
-		Arcanum_CreateMenu();
 		Arcanum_LoadIcons();
 		-- Gestion de la fin de l'incantation des sorts
 	elseif (event == "SPELLCAST_STOP") then

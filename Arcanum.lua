@@ -1117,6 +1117,7 @@ function Arcanum_FoodWaterSweep(Level)
 	WaterLocationCount = 0;
 	local foodLevel;
 	local waterLevel;
+	local orangeLevel = 9;
 
 	for j = ARCANUM_SPELL_TABLE.Rank[8], 1, -1 do
 		if Level >= Water_Minlvl[j] then
@@ -1126,10 +1127,6 @@ function Arcanum_FoodWaterSweep(Level)
 		end
 	end
 
-	if Level == 60 then
-		foodLevel = 9; -- oranges
-	end
-
 	ClearTable(FoodLocation);
 	ClearTable(WaterLocation);
 	for container = 0, 4, 1 do
@@ -1137,11 +1134,15 @@ function Arcanum_FoodWaterSweep(Level)
 			Arcanum_MoneyToggle();
 			ArcanumTooltip:SetBagItem(container, slot);
 			local itemName = ArcanumTooltipTextLeft1:GetText();
-			if itemName == ARCANUM_FOOD[FoodWaterLevel] then
+			if itemName == ARCANUM_FOOD[orangeLevel] then
 				local _, itemCount = GetContainerItemInfo(container, slot);
 				table.insert(FoodLocation, { container, slot, itemCount });
 				FoodLocationCount = FoodLocationCount + 1;
-			elseif itemName == ARCANUM_WATER[FoodWaterLevel] then
+			elseif itemName == ARCANUM_FOOD[foodLevel] then
+				local _, itemCount = GetContainerItemInfo(container, slot);
+				table.insert(FoodLocation, { container, slot, itemCount });
+				FoodLocationCount = FoodLocationCount + 1;
+			elseif itemName == ARCANUM_WATER[waterLevel] then
 				local _, itemCount = GetContainerItemInfo(container, slot);
 				table.insert(WaterLocation, { container, slot, itemCount });
 				WaterLocationCount = WaterLocationCount + 1;

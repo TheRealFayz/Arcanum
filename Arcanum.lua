@@ -1117,7 +1117,7 @@ function Arcanum_FoodWaterSweep(Level)
 	WaterLocationCount = 0;
 	local foodLevel;
 	local waterLevel;
-	local orangeLevel = 9;
+	local orangeLevel = 8;
 
 	for j = ARCANUM_SPELL_TABLE.Rank[8], 1, -1 do
 		if Level >= Water_Minlvl[j] then
@@ -1988,7 +1988,7 @@ function Arcanum_EDIconsV()
 		if OrangeCount > 0 then
 			ArcanumFoodCount:SetText(OrangeCount);
 			ArcanumButton1Texture:SetDesaturated(nil);
-		elseif FoodCount == 0 then
+		elseif FoodCount > 0 then
 			ArcanumFoodCount:SetText(FoodCount);
 			ArcanumButton1Texture:SetDesaturated(nil);
 		else

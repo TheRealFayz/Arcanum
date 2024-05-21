@@ -385,6 +385,7 @@ function Arcanum_OnDragStop(button)
 	button:StopMovingOrSizing();
 end
 
+local tick = 1
 -- Fonction lance  la mise  jour de l'interface (main) -- toutes les 0,1 secondes environ
 function Arcanum_OnUpdate()
 	--Si c'est la premiere update on initialize
@@ -392,6 +393,8 @@ function Arcanum_OnUpdate()
 		Arcanum_Initialize();
 		Loaded = true;
 	end
+
+  if tick > GetTime() then return else tick = GetTime() + .2 end
 
 	if englishClass == "MAGE" then
 		Arcanum_DisplayFading();

@@ -102,16 +102,6 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-                <FontString name="ArcanumMinimapIcon_Option" inherits="GameFontNormalSmall">
-					<Color r="1.0" g="1.0" b="1.0" a="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="ArcanumButtonOptionMenu" relativeFrom="TOPLEFT">
-							<Offset>
-								<AbsDimension x="60" y="-280"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -997,48 +987,6 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
-            <CheckButton name="ArcanumMinimapIcon_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
-				<Size>
-					<AbsDimension x="24" y="24"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="ArcanumButtonOptionMenu" relativeFrom="TOPLEFT">
-						<Offset>
-							<AbsDimension x="30" y="-275"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						if (this:GetChecked()) then
-							ArcanumConfig.MinimapIcon = true;
-                            ShowUIPanel(ArcanumMinimapButton);
-						else
-							ArcanumConfig.MinimapIcon = false;
-                            HideUIPanel(ArcanumMinimapButton);
-						end
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-            <Slider name="ArcanumMinimapRotate_Slider" inherits="OptionsSliderTemplate" minValue="0" maxValue="360" valueStep="1" virtual="true">
-				<Size>
-					<AbsDimension x="290" y="16"/>
-				</Size>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeTo="ArcanumButtonOptionMenu" relativeFrom="TOP">
-                            <Offset>
-                                <AbsDimension x="0" y="-90"/>
-                            </Offset>
-                        </Anchor>
-                    </Anchors>
-				<Scripts>
-					<OnValueChanged>
-						ArcanumConfig.MinimapIconPos = this:GetValue()
-                        ArcanumMinimapRotate_SliderText:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.ArcanumMinimapIconPos.." "..ArcanumConfig.MinimapIconPos.."°"));
-						Arcanum_MinimapMoveButton();
-					</OnValueChanged>
-				</Scripts>
-			</Slider>
         </Frames>
 		<Scripts>
 			<OnLoad>

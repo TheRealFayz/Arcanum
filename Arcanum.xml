@@ -63,7 +63,7 @@
         </Anchors>
     </Texture>
 
-    <Button name="ArcanumMinimapButton" parent="Minimap" movable="true">
+    <Button name="ArcanumMinimapButton" parent="Minimap" enableMouse="true" movable="true" draggable="true">
         <Size>
             <AbsDimension x="34" y="34"/>
         </Size>
@@ -125,6 +125,13 @@
                 return;
                 end
             </OnClick>
+            <OnDragStart>
+                this:StartMoving();
+            </OnDragStart>
+            <OnDragStop>
+                this:StopMovingOrSizing();
+                ArcanumMinimapMoved();
+            </OnDragStop>
         </Scripts>
     </Button>
 
@@ -478,9 +485,9 @@
         <Scripts>
             <OnEnter>
                 if ArcanumConfig.BuffType == 0 then
-                    Arcanum_BuildTooltip(this,"ANCHOR_CURSOR","Food");
+                Arcanum_BuildTooltip(this,"ANCHOR_CURSOR","Food");
                 else
-                    Arcanum_BuildTooltip(this,"ANCHOR_CURSOR","Oranges");
+                Arcanum_BuildTooltip(this,"ANCHOR_CURSOR","Oranges");
                 end
                 Arcanum_ButtonMouseOver(1);
             </OnEnter>

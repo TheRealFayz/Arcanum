@@ -355,6 +355,10 @@ function Arcanum_Initialize()
 		ArcanumManaGemCooldown:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
 		ArcanumButton4Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
 
+		if not pfUI or not pfUI.addonbuttons then
+			ArcanumMoveMinimapButton()
+		end
+
 		if ArcanumConfig.Toggle == false then
 			Arcanum_HideUI();
 			Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOff, "USER");
@@ -394,7 +398,11 @@ function Arcanum_OnUpdate()
 		Loaded = true;
 	end
 
-  if tick > GetTime() then return else tick = GetTime() + .2 end
+	if tick > GetTime() then
+		return
+	else
+		tick = GetTime() + .2
+	end
 
 	if englishClass == "MAGE" then
 		Arcanum_DisplayFading();
@@ -815,9 +823,6 @@ function Arcanum_LoadConfig()
 	if (ArcanumConfig.ManaGemButton) then
 		ArcanumManaGemButton_Button:SetChecked(1);
 	end
-	if (ArcanumConfig.MinimapIcon) then
-		ArcanumMinimapIcon_Button:SetChecked(1);
-	end
 
 	ArcanumEvocationLimit_Slider:SetValue(ArcanumConfig.EvocationLimit);
 	ArcanumEvocationLimit_SliderLow:SetText("0 %");
@@ -843,10 +848,6 @@ function Arcanum_LoadConfig()
 	ArcanumButtonScale_SliderLow:SetText("50 %");
 	ArcanumButtonScale_SliderHigh:SetText("150 %");
 	ArcanumButton:SetScale(ArcanumConfig.ArcanumButtonScale / 100);
-
-	ArcanumMinimapRotate_Slider:SetValue(ArcanumConfig.MinimapIconPos);
-	ArcanumMinimapRotate_SliderLow:SetText("0");
-	ArcanumMinimapRotate_SliderHigh:SetText("360");
 
 	if ArcanumConfig.NoDragAll then
 		Arcanum_NoDrag();
@@ -911,12 +912,11 @@ function Arcanum_LanguageInitialize()
 	ArcanumPortalButton_Option:SetText(ARCANUM_CONFIGURATION.PortalButton);
 	ArcanumFoodButton_Option:SetText(ARCANUM_CONFIGURATION.FoodButton);
 	ArcanumWaterButton_Option:SetText(ARCANUM_CONFIGURATION.WaterButton);
-	ArcanumMinimapIcon_Option:SetText(ARCANUM_CONFIGURATION.MinimapIcon);
 	ArcanumManaGemButton_Option:SetText(ARCANUM_CONFIGURATION.ManaGemButton);
 	ArcanumLeftClick:SetText(Arcanum_ColoredMsg(ARCANUM_MESSAGE.Tooltip.LeftClick));
 	ArcanumMiddleClick:SetText(Arcanum_ColoredMsg(ARCANUM_MESSAGE.Tooltip.MiddleClick));
 	ArcanumRightClick:SetText(Arcanum_ColoredMsg(ARCANUM_MESSAGE.Tooltip.RightClick));
-	ArcanumMinimapRotate_SliderText:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.ArcanumMinimapIconPos .. " " .. ArcanumConfig.MinimapIconPos .. "°"));
+
 	ClearTable(ArcanumLeftButtonClick);
 	for i = 1, table.getn(ARCANUM_CLICK) do
 		table.insert(ArcanumLeftButtonClick, ARCANUM_CLICK[i]);
@@ -1655,38 +1655,17 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
-function Arcanum_MinimapMoveButton()
+function ArcanumMoveMinimapButton()
 	ArcanumMinimapButton:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (80 * cos(ArcanumConfig.MinimapIconPos)), (80 * sin(ArcanumConfig.MinimapIconPos)) - 52);
 end
 
-function ArcanumIconDragging()
+function ArcanumMinimapMoved()
 	local xpos, ypos = GetCursorPosition()
-	local xmin, ymin = Minimap:GetLeft(), Minimap:GetBottom()
-
+	local xmin, ymin = Minimap:GetLeft() or 400, Minimap:GetBottom() or 400
 	xpos = xmin - xpos / Minimap:GetEffectiveScale() + 70
 	ypos = ypos / Minimap:GetEffectiveScale() - ymin - 70
 
-	ArcanumConfig.IconPos = math.deg(math.atan2(ypos, xpos))
-
-	move_button();
-end
-
-function move_button()
-	local xpos, ypos
-	local angle = ArcanumConfig.IconPos or 0
-
-	if ItemRack_Settings.SquareMinimap == "ON" then
-		-- brute force method until trig solution figured out - min/max a point on a circle beyond square
-		xpos = 110 * cos(angle)
-		ypos = 110 * sin(angle)
-		xpos = math.max(-82, math.min(xpos, 84))
-		ypos = math.max(-86, math.min(ypos, 82))
-	else
-		xpos = 80 * cos(angle)
-		ypos = 80 * sin(angle)
-	end
-
-	ArcanumMinimapButton:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - xpos, ypos - 52)
+	ArcanumConfig.MinimapIconPos = math.deg(math.atan2(ypos, xpos))
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -1697,11 +1676,6 @@ end
 
 function Arcanum_ButtonSetup()
 	if ArcanumConfig.Toggle == true then
-		if ArcanumConfig.MinimapIcon == true then
-			ShowUIPanel(ArcanumMinimapButton);
-		else
-			HideUIPanel(ArcanumMinimapButton);
-		end
 		Arcanum_Arcanum2ButtonSetup();
 	end
 end
@@ -1838,7 +1812,6 @@ end
 
 function Arcanum_HideUI()
 	isHidden = true;
-	HideUIPanel(ArcanumMinimapButton);
 	HideUIPanel(ArcanumButton);
 	HideUIPanel(ArcanumButton1);
 	HideUIPanel(ArcanumButton2);

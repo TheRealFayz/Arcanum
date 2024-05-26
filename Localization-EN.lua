@@ -107,8 +107,6 @@ function Arcanum_Localization_Dialog_En()
 		["FoodButton"] = "food",
 		["WaterButton"] = "water",
 		["ManaGemButton"] = "mana gem",
-		["MinimapIcon"] = "Show minimap icon",
-		["ArcanumMinimapIconPos"] = "Minimap icon position:",
 	};
 
 	ARCANUM_CLICK = {

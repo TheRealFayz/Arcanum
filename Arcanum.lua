@@ -1,4 +1,4 @@
-﻿-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 -- Arcanum
 
 -- Addon pour Mage inspiré du célébre Necrosis
@@ -18,7 +18,6 @@
 -- FONCTIONS GENERALES EN RELATION AVEC LE FICHIER XML
 
 ------------------------------------------------------------------------------------------------------
-
 
 Default_ArcanumConfig = {
 	Version = ArcanumData.Version;
@@ -361,7 +360,9 @@ function Arcanum_Initialize()
 
 		if ArcanumConfig.Toggle == false then
 			Arcanum_HideUI();
-			Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOff, "USER");
+			if firstLoad then
+				Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOff, "USER");
+			end
 		elseif firstLoad then
 			Arcanum_Msg(ARCANUM_MESSAGE.Interface.InitOn, "USER");
 			firstLoad = false;
@@ -393,7 +394,7 @@ local tick = 1
 -- Fonction lance  la mise  jour de l'interface (main) -- toutes les 0,1 secondes environ
 function Arcanum_OnUpdate()
 	--Si c'est la premiere update on initialize
-	if Loaded == false then
+	if Loaded == false  then
 		Arcanum_Initialize();
 		Loaded = true;
 	end

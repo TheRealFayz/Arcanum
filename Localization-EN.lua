@@ -167,20 +167,38 @@ function Arcanum_Localization_Dialog_En()
 end
 
 function Arcanum_Localization_Speech_En()
-	ARCANUM_SUMMON_ORANGE_MESSAGE = "ORANGES COME CLICK :)";
+	ARCANUM_SUMMON_ORANGE_MESSAGE = "This portal should summon oranges, but if you see tentacles RUN!  Yogg_Saron was not happy the last time...";
 
 	ARCANUM_PORTAL_MESSAGES = {
 		[1] = {
-			"The <me> Airline Company wishes you an enjoyable trip to <city>"
+			"Step right up! A portal to <city> is ready! Disclaimer: Missing limbs during transport are not <me>'s responsibility."
 		},
 		[2] = {
-			"Please click <me>'s portal and you will arrive at <city>"
+			"Portal to <city> is open. Monsters pouring out are complimentary!"
 		},
 		[3] = {
-			"Don't interrupt <me> now because <me2> is busy opening a portal to <city>"
+			"Summoning a portal to <city>! Fingers crossed it's not a shortcut to C'Thun's stomach this time."
 		},
 		[4] = {
-			"<city> is opening in 10 seconds, have a nice journey"
+			"Portal to <city> is open. Watch your step—rumor has it something creepy came through last time."
+		},
+		[5] = {
+			"<me> opens a portal to <city>. It's safe! (Mostly. Sometimes. Probably not.)"
+		},		
+		[6] = {
+			"<me> says: Hop through to <city>. Just... don’t think about what happened to the last guy."
+		},	
+		[7] = {
+			"The portal to <city> is open. If you see tentacles, uh... just run."
+		},
+		[8] = {
+			"Here is your portal to <city>. If you see C'Thun on the way, tell him <me> says hi."
+		},
+		[9] = {
+			"Portal to <city> is open. Warning: Some assembly may be required on arrival."
+		},
+		[10] = {
+			"Portal to <city> is ready. Side effects may include nausea, disorientation, and eldritch whispers."
 		},
 	};
 end
@@ -260,9 +278,9 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["QuirajiMount"] = "Quiraji Resonating Crystal",
 	};
 
-	ALLIANCE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore" };
+	HORDE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore" };
 
-	HORDE_DEST = { "Orgrimmar", "Thunder Bluff", "Undercity", "Stonard" };
+	ALLIANCE_DEST = { "Orgrimmar", "Thunder Bluff", "Undercity", "Stonard" };
 
 	-- Monture	
 	MOUNT = { { "Horn of the Black War Wolf", "Horn of the Brown Wolf", "Horn of the Red Wolf", "Horn of the Swift Brown Wolf", "Horn of the Timber Wolf" },

@@ -210,8 +210,8 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["Mage Armor"] = 3,
 		["Arcane Intellect"] = 4,
 		["Arcane Brilliance"] = 5,
-		["Dampen Magic"] = 6,
-		["Amplify Magic"] = 7,
+		["Teleport: Alah'Thalas"] = 6,
+		["Portal: Alah'Thalas"] = 7,
 		["Conjure Food"] = 8,
 		["Conjure Water"] = 9,
 		["Conjure Mana Agate"] = 10,
@@ -278,7 +278,7 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["QuirajiMount"] = "Quiraji Resonating Crystal",
 	};
 
-	HORDE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore" };
+	HORDE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore", "Alah'Thalas" };
 
 	ALLIANCE_DEST = { "Orgrimmar", "Thunder Bluff", "Undercity", "Stonard" };
 

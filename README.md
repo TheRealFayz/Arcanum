@@ -3,6 +3,7 @@ I got sick of trying to update this so it is very out of date - I recommend usin
 
 
 <hr>
+
 ![img.png](img.png)
 
 Tool to avoid having to keep a bunch of rarely used spells on your actionbars.

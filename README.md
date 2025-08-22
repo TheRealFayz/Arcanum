@@ -1,3 +1,5 @@
+I got sick of trying to update this so it is very out of date - I recommend using https://github.com/luskanek/Flyout instead
+
 ![img.png](img.png)
 
 Tool to avoid having to keep a bunch of rarely used spells on your actionbars.

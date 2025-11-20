@@ -167,7 +167,7 @@ function Arcanum_Localization_Dialog_En()
 end
 
 function Arcanum_Localization_Speech_En()
-	ARCANUM_SUMMON_ORANGE_MESSAGE = "This portal should summon oranges, but if you see tentacles RUN!  Yogg_Saron was not happy the last time...";
+	ARCANUM_SUMMON_ORANGE_MESSAGE = "This portal should summon oranges, but if you see tentacles RUN!  Yogg-Saron was not happy the last time...";
 
 	ARCANUM_PORTAL_MESSAGES = {
 		[1] = {

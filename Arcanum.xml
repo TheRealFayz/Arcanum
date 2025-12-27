@@ -1,4 +1,4 @@
-﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 >
     <Script file="Localization.lua"/>
     <Script file="Localization-FR.lua"/>
@@ -719,17 +719,29 @@
                     </Anchors>
                 </Texture>
             </Layer>
+            <Layer level="OVERLAY">
+                <FontString name="ArcanumButton5Text" inherits="GameFontHighlight">
+                    <Color r="1.0" g="1.0" b="1.0" a="1"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeTo="ArcanumButton5" relativeFrom="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
         </Layers>
         <Scripts>
             <OnEnter>
-                Arcanum_CallToolTip(5);
+                Arcanum_BuildTooltip(this,"ANCHOR_CURSOR","Hearthstone");
                 Arcanum_ButtonMouseOver(5);
             </OnEnter>
             <OnClick>
                 if ArcanumConfig.BuffType == 0 then
-                Arcanum_ArmorCast(2);
+                Arcanum_UseItem("Hearthstone");
                 else
-                Arcanum_ArmorCast(3);
+                Arcanum_UseItem("Karazhan");
                 end
             </OnClick>
             <OnLeave>
@@ -782,9 +794,9 @@
                 Arcanum_MagicMenu(arg1);
                 else
                 if ArcanumConfig.BuffType == 0 then
-                Arcanum_MagicCast(6);
+                Arcanum_PortalCast(45);
                 else
-                Arcanum_MagicCast(7);
+                Arcanum_PortalCast(55);
                 end
                 end
             </OnClick>

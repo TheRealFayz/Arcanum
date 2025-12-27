@@ -1,23 +1,21 @@
-﻿------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 -- Arcanum
 
--- Addon pour Mage inspiré du célébre Necrosis
--- Gestion des buffs, des portails et Compteur de Composants
+-- Addon for Mage inspired by the famous Necrosis
+-- Management of buffs, portals and Component Counter
 
--- Remerciements aux auteurs de Necrosis
+-- Thanks to the authors of Necrosis
 
--- Auteur Lenny415
-
--- Serveur:
--- Uliss, Nausicaa, Solcarlus, Thémys on Medivh EU
+-- Author Lenny415
+-- Reworked by Fayz for Turtle WoW
 ------------------------------------------------------------------------------------------------------
--- Fonctions reprises de Necrosis MERCI à leurs auteurs
+-- Functions taken from Necrosis - THANK YOU to their authors
 
 
 
 
 ------------------------------------------------------------------------------------------------------
--- FONCTIONS D'AFFICHAGE (CONSOLE, CHAT, MESSAGE SYSTEME)
+-- DISPLAY FUNCTIONS (CONSOLE, CHAT, SYSTEM MESSAGE)
 ------------------------------------------------------------------------------------------------------
 
 
@@ -66,7 +64,7 @@ end
 
 
 ------------------------------------------------------------------------------------------------------
--- ... ET LE COLORAMA FUT !
+-- ... AND THE COLORAMA WAS BORN!
 ------------------------------------------------------------------------------------------------------
 
 function Arcanum_ColoredMsg(msg)
@@ -107,7 +105,7 @@ function IntToHex(value)
     return a..b;
 end
 
--- Remplace dans les chaines les codes de coloration par les dfinitions de couleur associes
+-- Replaces color codes in strings with associated color definitions
 function Arcanum_MsgAddColor(msg)
 	msg = string.gsub(msg, "<white>", "|CFFFFFFFF");
 	msg = string.gsub(msg, "<lightBlue>", "|CFF99CCFF");
@@ -133,7 +131,7 @@ function Arcanum_MsgAddColor(msg)
 end
 
 
--- Insre dans les timers des codes de coloration en fonction du pourcentage de temps restant
+-- Inserts color codes in timers based on remaining time percentage
 function ArcanumTimerColor(percent)
 	local color = "<brightGreen>";
 	if (percent < 10) then
@@ -159,7 +157,7 @@ function ArcanumTimerColor(percent)
 end
 
 ------------------------------------------------------------------------------------------------------
--- VARIABLES USER-FRIENDLY DANS LES MESSAGES D'INVOCATION
+-- USER-FRIENDLY VARIABLES IN SUMMONING MESSAGES
 ------------------------------------------------------------------------------------------------------
 
 function Arcanum_MsgReplace(msg, dest)

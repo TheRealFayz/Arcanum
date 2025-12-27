@@ -1,4 +1,4 @@
-﻿<Bindings>   		
+<Bindings>   		
 		<Binding name="ACTIVATE" header="ARCANUM_BIND">
 			Arcanum_LoadUI();
     	</Binding>

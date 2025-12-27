@@ -1,15 +1,13 @@
-﻿------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 -- Arcanum
 
--- Addon pour Mage inspiré du célébre Necrosis
--- Gestion des buffs, des portails et Compteur de Composants
+-- Addon for Mage inspired by the famous Necrosis
+-- Management of buffs, portals and Component Counter
 
--- Remerciements aux auteurs de Necrosis
+-- Thanks to the authors of Necrosis
 
--- Auteur Lenny415
-
--- Serveur:
--- Uliss, Nausicaa, Solcarlus, Thémys on Medivh EU
+-- Author Lenny415
+-- Reworked by Fayz for Turtle WoW
 ------------------------------------------------------------------------------------------------------
 
 function Arcanum_Localization_Dialog_En()
@@ -168,37 +166,72 @@ end
 
 function Arcanum_Localization_Speech_En()
 	ARCANUM_SUMMON_ORANGE_MESSAGE = "This portal should summon oranges, but if you see tentacles RUN!  Yogg-Saron was not happy the last time...";
+	
+	-- Random messages for Ritual of Refreshment (Oranges)
+	ARCANUM_ORANGE_MESSAGES = {
+		[1] = {
+			"channels arcane energy, conjuring a mystical table laden with mana-infused oranges. \"Fresh from the Twisting Nether! Probably safe to eat.\""
+		},
+		[2] = {
+			"weaves a complex spell, summoning a feast of glowing oranges. \"Warning: May cause temporary levitation and uncontrollable giggling.\""
+		},
+		[3] = {
+			"gestures dramatically as a shimmering table materializes, covered in magical oranges. \"Don't ask where these come from. Trust me.\""
+		},
+		[4] = {
+			"opens a small rift to the Nether, pulling through a table of refreshments. \"If you see tentacles instead of oranges, RUN! Yogg-Saron wasn't happy last time...\""
+		},
+		[5] = {
+			"summons a feast with a flourish, arcane symbols swirling around the oranges. \"Disclaimer: Side effects may include temporary purple skin.\""
+		},
+		[6] = {
+			"conjures a table of mana oranges, the fruit pulsing with otherworldly energy. \"Better than a vending machine! Probably.\""
+		},
+		[7] = {
+			"channels the arcane, creating a magnificent spread of glowing refreshments. \"All-you-can-eat! No refunds if you turn into a sheep.\""
+		},
+		[8] = {
+			"summons a table loaded with enchanted oranges, sparks of magic dancing across them. \"Free samples! Not responsible for addiction to arcane fruit.\""
+		},
+		[9] = {
+			"opens a portal briefly, yanking through a feast before it closes. \"Quick, grab some before they teleport back!\""
+		},
+		[10] = {
+			"weaves intricate runes, manifesting a table of refreshments from pure mana. \"Completely natural! If you consider interdimensional fruit natural.\""
+		},
+	};
+
 
 	ARCANUM_PORTAL_MESSAGES = {
 		[1] = {
-			"Step right up! A portal to <city> is ready! Disclaimer: Missing limbs during transport are not <me>'s responsibility."
+			"conjures a shimmering portal to <city>, its edges crackling with arcane energy. \"Step right up! Disclaimer: Missing limbs during transport are not my responsibility.\""
 		},
 		[2] = {
-			"Portal to <city> is open. Monsters pouring out are complimentary!"
+			"opens a swirling vortex to <city>. Strange shapes seem to be pouring out... wait, those are just confused travelers. Probably."
 		},
 		[3] = {
-			"Summoning a portal to <city>! Fingers crossed it's not a shortcut to C'Thun's stomach this time."
+			"weaves intricate gestures, summoning a portal to <city>. Fingers crossed it's not a shortcut to C'Thun's stomach this time."
 		},
 		[4] = {
-			"Portal to <city> is open. Watch your step—rumor has it something creepy came through last time."
+			"tears open a gateway to <city>, the portal pulsing with unstable magic. \"Watch your step—something creepy came through last time.\""
 		},
 		[5] = {
-			"<me> opens a portal to <city>. It's safe! (Mostly. Sometimes. Probably not.)"
-		},		
+			"opens a portal to <city> with a flourish. \"It's safe! Mostly. Sometimes. Probably not.\""
+		},
 		[6] = {
-			"<me> says: Hop through to <city>. Just... don’t think about what happened to the last guy."
-		},	
+			"gestures grandly as a portal to <city> materializes. \"Hop through! Just... don't think about what happened to the last guy.\""
+		},
 		[7] = {
-			"The portal to <city> is open. If you see tentacles, uh... just run."
+			"summons a churning gateway to <city>. The portal's edges seem to writhe ominously. \"If you see tentacles, uh... just run.\""
 		},
 		[8] = {
-			"Here is your portal to <city>. If you see C'Thun on the way, tell him <me> says hi."
+			"channels arcane power, opening a passage to <city>. \"If you see C'Thun on the way, tell <me2> I say hi.\""
 		},
 		[9] = {
-			"Portal to <city> is open. Warning: Some assembly may be required on arrival."
+			"creates a portal to <city>, though it flickers uncertainly. \"Warning: Some assembly may be required on arrival.\""
 		},
 		[10] = {
-			"Portal to <city> is ready. Side effects may include nausea, disorientation, and eldritch whispers."
+			"opens a dimensional rift to <city>, eldritch whispers echoing from within. \"Side effects may include nausea, disorientation, and existential dread.\""
 		},
 	};
 end
@@ -233,6 +266,7 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["Teleport: Ironforge"] = 42,
 		["Teleport: Stormwind"] = 43,
 		["Teleport: Theramore"] = 44,
+		["Teleport: Alah'Thalas"] = 45,
 
 		["Teleport: Orgrimmar"] = 41,
 		["Teleport: Thunder Bluff"] = 42,
@@ -243,6 +277,7 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["Portal: Ironforge"] = 52,
 		["Portal: Stormwind"] = 53,
 		["Portal: Theramore"] = 54,
+		["Portal: Alah'Thalas"] = 55,
 
 		["Portal: Orgrimmar"] = 51,
 		["Portal: Thunder Bluff"] = 52,
@@ -276,11 +311,12 @@ if (GetLocale() == "enUS") or (GetLocale() == "enGB") then
 		["LightFeathers"] = "Light Feather",
 		["Hearthstone"] = "Hearthstone",
 		["QuirajiMount"] = "Quiraji Resonating Crystal",
+		["Atiesh"] = "Atiesh, Greatstaff of the Guardian",
 	};
 
-	HORDE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore" };
+	HORDE_DEST = { "Orgrimmar", "Thunder Bluff", "Undercity", "Stonard" };
 
-	ALLIANCE_DEST = { "Orgrimmar", "Thunder Bluff", "Undercity", "Stonard" };
+	ALLIANCE_DEST = { "Darnassus", "Ironforge", "Stormwind", "Theramore", "Alah'Thalas" };
 
 	-- Monture	
 	MOUNT = { { "Horn of the Black War Wolf", "Horn of the Brown Wolf", "Horn of the Red Wolf", "Horn of the Swift Brown Wolf", "Horn of the Timber Wolf" },

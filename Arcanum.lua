@@ -1,21 +1,19 @@
 -------------------------------------------------------------------------------------------------------
 -- Arcanum
 
--- Addon pour Mage inspiré du célébre Necrosis
--- Gestion des buffs, des portails et Compteur de Composants
+-- Addon for Mage inspired by the famous Necrosis
+-- Management of buffs, portals and Component Counter
 
--- Remerciements aux auteurs de Necrosis
+-- Thanks to the authors of Necrosis
 
--- Auteur Lenny415
-
--- Serveur:
--- Uliss, Nausicaa, Solcarlus, Thémys on Medivh EU
+-- Author Lenny415
+-- Reworked by Fayz for Turtle WoW
 ------------------------------------------------------------------------------------------------------
 
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS GENERALES EN RELATION AVEC LE FICHIER XML
+-- GENERAL FUNCTIONS RELATED TO THE XML FILE
 
 ------------------------------------------------------------------------------------------------------
 
@@ -105,8 +103,8 @@ local isHidden = false;
 local hiddenByUser = false;
 local firstLoad = true;
 
--- Variables utilisés pour la gestion des composants
--- (principalement comptage)
+-- Variables used for component management
+-- (mainly counting)
 local ArcanumArcanePowder = nil;
 local ArcanumRuneOfTeleportation = nil;
 local ArcanumRuneOfPortals = nil;
@@ -128,6 +126,14 @@ local IceblockDone = false;
 local IceblockWait = false;
 local IceblockWaitTimer = nil;
 local HearthstoneLocation = { nil, nil };
+local AtieshLocation = { nil, nil };
+local AtieshEquipped = false;
+local AtieshCooldown = 0;
+local AtieshUsed = false; -- Track when Atiesh use is initiated
+local HearthstoneCooldown = 0; -- Track Hearthstone cooldown (60 min)
+local HearthstoneUsed = false; -- Track when Hearthstone use is initiated
+local HearthstoneUseTime = 0; -- Track when Hearthstone button was clicked
+local PortalCooldown = {0, 0, 0, 0}; -- Cooldowns for portal buttons 7, 8, 9, 10
 local MountLocation = { nil, nil };
 local MountName = { nil };
 local MountIcon = { nil };
@@ -143,9 +149,10 @@ local PlayerZone = nil;
 local playerClass, englishClass = nil;
 
 local TPMess = 0;
+local OrangeMess = 0; -- Track last orange message to avoid repeats
 local RandMount = 0;
 
--- Menus : Permet l'affichage des menus de buff...
+-- Menus: Allows display of buff menus...
 local BuffShow = false;
 local BuffMenuShow = false;
 local ArmorShow = false;
@@ -157,27 +164,27 @@ local PortalMenuShow = false;
 local MountShow = false;
 local MountMenuShow = false;
 
--- Menus : Permet la disparition progressive du menu des buffs (transparence)
+-- Menus: Allows progressive fading of buff menu (transparency)
 local AlphaBuffMenu = 1;
 local AlphaBuffVar = 0;
 local BuffVisible = false;
 
--- Menus : Permet la disparition progressive du menu des armures (transparence)
+-- Menus: Allows progressive fading of armor menu (transparency)
 local AlphaArmorMenu = 1;
 local AlphaArmorVar = 0;
 local ArmorVisible = false;
 
--- Menus : Permet la disparition progressive du menu des magies (transparence)
+-- Menus: Allows progressive fading of magic menu (transparency)
 local AlphaMagicMenu = 1;
 local AlphaMagicVar = 0;
 local MagicVisible = false;
 
--- Menus : Permet la disparition progressive du menu des portails (transparence)
+-- Menus: Allows progressive fading of portal menu (transparency)
 local AlphaPortalMenu = 1;
 local AlphaPortalVar = 0;
 local PortalVisible = false;
 
--- Menus : Permet la disparition progressive du menu des montures (transparence)
+-- Menus: Allows progressive fading of mount menu (transparency)
 local AlphaMountMenu = 1;
 local AlphaMountVar = 0;
 local MountVisible = false;
@@ -187,7 +194,7 @@ local AlphaDisplayVar = 0;
 local DisplayFadingLimit = 0;
 local DisplayFadingWay = -1;
 
--- Liste des boutons disponible pour le démoniste dans chaque menu
+-- List of available buttons for the mage in each menu
 local BuffMenuCreate = {};
 local ArmorMenuCreate = {};
 local MagicMenuCreate = {};
@@ -252,21 +259,19 @@ local CoolDown = {
 };
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE L'INTERFACE
+-- INTERFACE FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
--- Fonction applique au chargement
+-- Function applied at loading
 function Arcanum_OnLoad()
 	playerClass, englishClass = UnitClass("player");
-
-	local englishFaction, _ = UnitFactionGroup("player")
 
 	if englishClass == "MAGE" then
 		this:RegisterForDrag("LeftButton");
 		this:RegisterForClicks("LeftButtonUp", "MiddleButtonUp", "RightButtonUp");
 
-		-- Enregistrement des événements interceptés par ARCANUM
+		-- Enregistrement des Ã©vÃ©nements interceptÃ©s par ARCANUM
 		this:RegisterEvent("PLAYER_ENTERING_WORLD");
 		this:RegisterEvent("PLAYER_LEAVING_WORLD");
 		this:RegisterEvent("BAG_UPDATE");
@@ -302,11 +307,11 @@ function Arcanum_OnLoad()
 	end
 end
 
--- Fonction d'initialisation
+-- Initialization function
 function Arcanum_Initialize()
 	isHidden = false;
 	if englishClass == "MAGE" then
-		-- On charge (ou on créé) la configuration pour le joueur et on l'affiche sur la console
+		-- On charge (ou on crÃ©Ã©) la configuration pour le joueur et on l'affiche sur la console
 		if ArcanumConfig == nil or ArcanumConfig.Version ~= Default_ArcanumConfig.Version then
 			ArcanumConfig = {};
 			ArcanumConfig = Default_ArcanumConfig;
@@ -316,7 +321,9 @@ function Arcanum_Initialize()
 			Arcanum_Localization_Dialog_En();
 		end
 
-		ArcanumConfig.IsAlliance = (englishFaction == "Alliance");
+		-- Get fresh faction data (important for Turtle WoW High Elves/Goblins)
+		local currentFaction, _ = UnitFactionGroup("player")
+		ArcanumConfig.IsAlliance = (currentFaction == "Alliance");
 
 		-- Recupertation du nom du joueur
 		PlayerName = UnitName("player");
@@ -331,7 +338,7 @@ function Arcanum_Initialize()
 			ArcanumConfig.LastArmor = 1;
 		end
 
-		--Chargements de l'UI et décompte des composants
+		--Chargements de l'UI et dÃ©compte des composants
 		Arcanum_BagExplore();
 		Arcanum_InitButtons();
 		if ArcanumConfig.ArcanumLockServ then
@@ -353,6 +360,11 @@ function Arcanum_Initialize()
 		ArcanumWaterCount:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
 		ArcanumManaGemCooldown:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
 		ArcanumButton4Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
+		ArcanumButton5Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
+		ArcanumButton7Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
+		ArcanumButton8Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
+		ArcanumButton9Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
+		ArcanumButton10Text:SetFont(GameFontHighlight:GetFont(), 12, "OUTLINE")
 
 		if not pfUI or not pfUI.addonbuttons then
 			ArcanumMoveMinimapButton()
@@ -373,7 +385,7 @@ function Arcanum_Initialize()
 	end
 end
 
--- Fonction permettant le dplacement d'lments de Arcanum sur l'écran
+-- Function allowing movement of Arcanum elements on screen
 function Arcanum_OnDragStart(button)
 	if (button == "ArcanumIcon") then
 		GameTooltip:Hide();
@@ -382,7 +394,7 @@ function Arcanum_OnDragStart(button)
 	button:StartMoving();
 end
 
--- Fonction arrêtant le déplacement d'éléments de ARCANUM sur l'écran
+-- Function stopping movement of ARCANUM elements on screen
 function Arcanum_OnDragStop(button)
 	if (button == "ArcanumIcon") then
 		Arcanum_BuildTooltip("OVERALL");
@@ -391,7 +403,7 @@ function Arcanum_OnDragStop(button)
 end
 
 local tick = 1
--- Fonction lance  la mise  jour de l'interface (main) -- toutes les 0,1 secondes environ
+-- Function launches interface update (main) -- approximately every 0.1 seconds
 function Arcanum_OnUpdate()
 	--Si c'est la premiere update on initialize
 	if Loaded == false  then
@@ -408,6 +420,73 @@ function Arcanum_OnUpdate()
 	if englishClass == "MAGE" then
 		Arcanum_DisplayFading();
 		ArcanumT = ArcanumT + arg1;
+		
+		-- Check if Hearthstone was used and has started its actual cooldown (not just the cast time)
+		if HearthstoneUsed and HearthstoneLocation[1] ~= nil then
+			local start, duration = GetContainerItemCooldown(HearthstoneLocation[1], HearthstoneLocation[2])
+			-- Only set cooldown if the actual 60-minute cooldown has started (duration > 3000 seconds)
+			-- This prevents triggering during the 10-second cast time
+			if start > 0 and duration > 3000 then
+				-- Hearthstone cooldown has started, set our tracking cooldown
+				HearthstoneCooldown = GetTime() + duration
+				HearthstoneUsed = false
+			elseif HearthstoneUseTime > 0 and GetTime() - HearthstoneUseTime > 15 then
+				-- Clear flag after 15 seconds if cast was interrupted
+				HearthstoneUsed = false
+				HearthstoneUseTime = 0
+			end
+		end
+		
+		-- Update Button 5 display: Hearthstone cooldown in solo mode, Atiesh cooldown in group mode
+		if ArcanumConfig.BuffType == 0 then
+			-- Solo mode: Show Hearthstone cooldown
+			if HearthstoneCooldown > GetTime() then
+				local remaining = math.ceil(HearthstoneCooldown - GetTime())
+				if remaining > 60 then
+					ArcanumButton5Text:SetText(tostring(math.ceil(remaining / 60)) .. "m")
+				else
+					ArcanumButton5Text:SetText(tostring(remaining) .. "s")
+				end
+				ArcanumButton5Text:Show()
+			else
+				ArcanumButton5Text:SetText("")
+				ArcanumButton5Text:Hide()
+			end
+		else
+			-- Group mode: Show Atiesh cooldown
+			if AtieshCooldown > GetTime() then
+				local remaining = math.ceil(AtieshCooldown - GetTime())
+				if remaining > 60 then
+					ArcanumButton5Text:SetText(tostring(math.ceil(remaining / 60)) .. "m")
+				else
+					ArcanumButton5Text:SetText(tostring(remaining) .. "s")
+				end
+				ArcanumButton5Text:Show()
+			else
+				ArcanumButton5Text:SetText("")
+				ArcanumButton5Text:Hide()
+			end
+		end
+		
+		-- Update portal cooldown displays (buttons 7, 8, 9, 10)
+		for i = 1, 4 do
+			local buttonNum = i + 6 -- Button 7 = i+6 where i=1, Button 10 = i+6 where i=4
+			local textElement = getglobal("ArcanumButton" .. buttonNum .. "Text")
+			
+			if PortalCooldown[i] > GetTime() then
+				local remaining = math.ceil(PortalCooldown[i] - GetTime())
+				if remaining > 60 then
+					textElement:SetText(tostring(math.ceil(remaining / 60)) .. "m")
+				else
+					textElement:SetText(tostring(remaining) .. "s")
+				end
+				textElement:Show()
+			else
+				textElement:SetText("")
+				textElement:Hide()
+			end
+		end
+		
 		if ArcanumT >= ArcanumButtonDisplayT then
 			ArcanumButtonDisplayT = ArcanumButtonDisplayT + 0.5;
 			Arcanum_Cooldown();
@@ -507,11 +586,11 @@ function Arcanum_OnEvent(event)
 		Arcanum_SpellSetup();
 		Arcanum_ButtonSetup();
 		Arcanum_LoadIcons();
-		-- Gestion de la fin de l'incantation des sorts
+		-- Managing end of spell casting
 	elseif (event == "SPELLCAST_STOP") then
 		Arcanum_SpellManagement();
 		-- Quand le mage commence  incanter un sort, on intercepte le nom de celui-ci
-		-- On sauve également le nom de la cible du sort ainsi que son niveau
+		-- On sauve Ã©galement le nom de la cible du sort ainsi que son niveau
 	elseif (event == "SPELLCAST_START") then
 		SpellCastName = arg1;
 		SpellTargetName = UnitName("target");
@@ -528,6 +607,7 @@ function Arcanum_OnEvent(event)
 		SpellCastRank = nil;
 		SpellTargetName = nil;
 		SpellTargetLevel = nil;
+		AtieshUsed = false; -- Clear Atiesh flag if cast was interrupted
 	elseif event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" then
 
 	elseif event == "CHAT_MSG_SPELL_AURA_GONE_OTHER" then
@@ -569,9 +649,9 @@ function Arcanum_OnEvent(event)
 	end
 end
 
--- Gestion du clic sur Arcanum
--- Clique gauche: Passe Arcanum en mode buff Individuel/Classe
--- Clique droit: Pierre de Foyer
+-- Managing clicks on Arcanum
+-- Left click: Switch Arcanum to Individual/Class buff mode
+-- Right click: Hearthstone
 
 function Arcanum_OnClick(button)
 	if (button == "LeftButton") then
@@ -583,7 +663,7 @@ function Arcanum_OnClick(button)
 	end
 end
 
--- Création et Affichage des bulles d'aides
+-- Creation and Display of help tooltips
 function Arcanum_BuildTooltip(button, anchor, type)
 	GameTooltip:SetOwner(button, anchor);
 	if (type == "Mount") then
@@ -613,6 +693,22 @@ function Arcanum_BuildTooltip(button, anchor, type)
 		end
 	elseif (type == "MageArmor") then
 		GameTooltip:SetSpell(ARCANUM_SPELL_TABLE.ID[3], 1);
+	elseif (type == "Karazhan") then
+		GameTooltip:AddLine(Arcanum_ColoredMsg("Portal: Karazhan"));
+		GameTooltip:AddLine("Click to open portal");
+		if not AtieshEquipped then
+			GameTooltip:AddLine("(Will equip Atiesh first)")
+		end
+	elseif (type == "AlahThalasTP") then
+		if (ARCANUM_SPELL_TABLE.ID[45] ~= nil) then
+			GameTooltip:SetSpell(ARCANUM_SPELL_TABLE.ID[45], 1);
+			GameTooltip:AddLine(ArcanumRuneOfTeleportation .. " Runes Left");
+		end
+	elseif (type == "AlahThalasPortal") then
+		if (ARCANUM_SPELL_TABLE.ID[55] ~= nil) then
+			GameTooltip:SetSpell(ARCANUM_SPELL_TABLE.ID[55], 1);
+			GameTooltip:AddLine(ArcanumRuneOfPortals .. " Runes Left");
+		end
 	elseif (type == "Oranges") then
 		GameTooltip:SetSpell(ARCANUM_SPELL_TABLE.ID[35], 1);
 		GameTooltip:AddLine("Left click to use, Right click to create");
@@ -709,8 +805,8 @@ function Arcanum_CallToolTip(Id)
 		{},
 		{},
 		{ "Buff", "ArcaneIntellect", "ArcaneBrilliance" },
-		{ "Armor", "FrostArmor", "MageArmor" },
-		{ "Magic", "DampenMagic", "AmplifyMagic" },
+		{ "Armor", "FrostArmor", "Karazhan" },
+		{ "Portal", "AlahThalasTP", "AlahThalasPortal" },
 		{ "Portal", "Teleport1", "Portal1" },
 		{ "Portal", "Teleport2", "Portal2" },
 		{ "Portal", "Teleport3", "Portal3" },
@@ -724,7 +820,7 @@ function Arcanum_CallToolTip(Id)
 end
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE CHARGEMENT DE LA CONFIGURATION
+-- CONFIGURATION LOADING FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
@@ -806,9 +902,6 @@ function Arcanum_LoadConfig()
 	if (ArcanumConfig.BuffButton) then
 		ArcanumBuffButton_Button:SetChecked(1);
 	end
-	if (ArcanumConfig.ArmorButton) then
-		ArcanumArmorButton_Button:SetChecked(1);
-	end
 	if (ArcanumConfig.MagicButton) then
 		ArcanumMagicButton_Button:SetChecked(1);
 	end
@@ -863,7 +956,7 @@ end
 function Arcanum_LanguageInitialize()
 	ArcanumLocalization();
 	-- Localisation du XML
-	ArcanumVersion:SetText(Arcanum_ColoredMsg(ArcanumData.AppName) .. "|CFFFFFFFF " .. ArcanumData.Version .. " by " .. ArcanumData.Author);
+	ArcanumVersion:SetText(Arcanum_ColoredMsg(ArcanumData.AppName) .. "|CFFFFFFFF V" .. ArcanumData.Version .. " by " .. ArcanumData.Author .. ", updated by Fayz");
 
 	ArcanumGeneralPageText:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Menu1));
 	ArcanumMessagePlayer_Section:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.MessageMenu1));
@@ -908,7 +1001,6 @@ function Arcanum_LanguageInitialize()
 	ArcanumButton_Option:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Button));
 	ArcanumOrder_Option:SetText(Arcanum_ColoredMsg(ARCANUM_CONFIGURATION.Order));
 	ArcanumBuffButton_Option:SetText(ARCANUM_CONFIGURATION.BuffButton);
-	ArcanumArmorButton_Option:SetText(ARCANUM_CONFIGURATION.ArmorButton);
 	ArcanumMagicButton_Option:SetText(ARCANUM_CONFIGURATION.MagicButton);
 	ArcanumPortalButton_Option:SetText(ARCANUM_CONFIGURATION.PortalButton);
 	ArcanumFoodButton_Option:SetText(ARCANUM_CONFIGURATION.FoodButton);
@@ -947,7 +1039,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES FENETRES DE CONFIGURATION
+-- CONFIGURATION WINDOW MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
@@ -1012,7 +1104,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTION DE GESTION DES COMPOS A ACHETER
+-- REAGENT PURCHASE MANAGEMENT FUNCTION
 
 ------------------------------------------------------------------------------------------------------
 function Arcanum_AutoBuy()
@@ -1183,7 +1275,7 @@ function FoodWaterSwitch(table, a, b)
 end
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES SACS (LOCALISATION ET COMPTABILISATION DES COMPOSANTS, OBJETS INVOQUES)
+-- BAG MANAGEMENT FUNCTIONS (LOCATION AND COUNTING OF COMPONENTS, SUMMONED OBJECTS)
 
 ------------------------------------------------------------------------------------------------------
 
@@ -1297,6 +1389,9 @@ function Arcanum_BagExplore()
 					ArcanumButtonDisplayTexture[1] = texture;
 					HearthstoneLocation = { container, slot };
 				end
+				if itemName == ARCANUM_ITEM.Atiesh then
+					AtieshLocation = { container, slot };
+				end
 				if itemName == ARCANUM_ITEM.ArcanePowder then
 					ArcanumArcanePowder = ArcanumArcanePowder + itemCount;
 				end
@@ -1392,16 +1487,18 @@ function ClearTable(Table)
 	end
 end
 
--- Fonction pour gérer les actions effectuées par Arcanum au clic sur un boutton
+-- Fonction pour gÃ©rer les actions effectuÃ©es par Arcanum au clic sur un boutton
 function Arcanum_UseItem(type, button)
 	if MerchantOpened == false then
-		-- Fonction pour utiliser une pierre de foyer dans l'inventaire
+		-- Function to use Hearthstone from inventory
 		if (type == "Hearthstone") then
-			-- Trouve les items utilisés par Arcanum
+			-- Find the item used by Arcanum
 			if (HearthstoneLocation[1] ~= nil) then
-				-- on l'utilise
+				-- Use it and set flag - cooldown will be set after cast completes
 				UseContainerItem(HearthstoneLocation[1], HearthstoneLocation[2]);
-				-- soit il n'y en a pas dans l'inventaire, on affiche un message d'erreur
+				HearthstoneUsed = true;
+				HearthstoneUseTime = GetTime();
+			-- If not in inventory, display error message
 			else
 				Arcanum_Msg(ARCANUM_MESSAGE.Error.NoHearthstone, "USER");
 			end
@@ -1442,7 +1539,16 @@ function Arcanum_UseItem(type, button)
 			if (button == "RightButton") then
 				if ArcanumConfig.BuffType == 1 and ARCANUM_SPELL_TABLE.ID[35] ~= nil then
 					if ArcanumConfig.OrangesMessage then
-						SendChatMessage(ARCANUM_SUMMON_ORANGE_MESSAGE, "SAY");
+						-- Select random orange message (avoid repeating last one)
+						local tempnum = random(1, table.getn(ARCANUM_ORANGE_MESSAGES));
+						while tempnum == OrangeMess and table.getn(ARCANUM_ORANGE_MESSAGES) >= 2 do
+							tempnum = random(1, table.getn(ARCANUM_ORANGE_MESSAGES));
+						end
+						OrangeMess = tempnum;
+						-- Send as emote
+						for i = 1, table.getn(ARCANUM_ORANGE_MESSAGES[tempnum]) do
+							SendChatMessage(ARCANUM_ORANGE_MESSAGES[tempnum][i], "EMOTE");
+						end
 					end
 					CastSpell(ARCANUM_SPELL_TABLE.ID[35], "spell");
 				elseif (UnitExists("target") and UnitIsPlayer("target")) then
@@ -1514,16 +1620,53 @@ function Arcanum_UseItem(type, button)
 				ManaGemCount = ManaGemCount - 1;
 			end
 		end
+		
+		-- Portal: Karazhan via Atiesh
+		if (type == "Karazhan") then
+			Arcanum_UseAtiesh();
+		end
+	end
+end
+
+-- Function to handle Atiesh and Portal: Karazhan
+function Arcanum_UseAtiesh()
+	-- Check if Atiesh is equipped
+	local mainHandLink = GetInventoryItemLink("player", 16)
+	AtieshEquipped = mainHandLink and string.find(mainHandLink, ARCANUM_ITEM.Atiesh)
+	
+	if not AtieshEquipped then
+		-- Atiesh is not equipped, try to equip it
+		if AtieshLocation[1] ~= nil then
+			-- Equip Atiesh
+			PickupContainerItem(AtieshLocation[1], AtieshLocation[2])
+			PickupInventoryItem(16) -- Main hand slot
+			Arcanum_Msg("Equipping Atiesh... Use button again after weapon swap to cast portal.", "USER")
+		else
+			Arcanum_Msg("Atiesh not found in bags!", "USER")
+		end
+	else
+		-- Check if portal cooldown is active (60-second cooldown after casting)
+		if AtieshCooldown > GetTime() then
+			local remaining = math.ceil(AtieshCooldown - GetTime())
+			Arcanum_Msg("Portal cooldown: " .. remaining .. " seconds remaining.", "USER")
+		else
+			-- Atiesh is equipped and cooldown expired, use it from the equipped slot
+			-- Send emote
+			SendChatMessage("raises Atiesh high as a vortex opens, crackling with fel energy. A gateway to demon-haunted Karazhan emerges, calling the brave—and the doomed.", "EMOTE")
+			AtieshUsed = true -- Flag that we're using Atiesh
+			UseInventoryItem(16) -- Use main hand item (Atiesh)
+			-- Cooldown will be set by Arcanum_SpellManagement when cast completes
+		end
 	end
 end
 
 ---------------------------------------------------------------------------------------------
 
--- FONCTIONS DE RECENSEMENT DES SORTS
+-- SPELL CENSUS FUNCTIONS
 
 ---------------------------------------------------------------------------------------------
 
--- Créé la liste des sorts connus par le mage, et les classe par rangs.
+-- Creates the list of spells known by the mage, and classifies them by rank.
 function Arcanum_SpellSetup()
 	local CurrentSpells = {
 		ID = {},
@@ -1535,7 +1678,7 @@ function Arcanum_SpellSetup()
 	local Invisible = 0;
 	local InvisibleID = 0;
 
-	-- On va parcourir tous les sorts possedés par le Mage
+	-- On va parcourir tous les sorts possedÃ©s par le Mage
 	while true do
 		local spellName, subSpellName = GetSpellName(spellID, BOOKTYPE_SPELL);
 		if not spellName then
@@ -1545,8 +1688,8 @@ function Arcanum_SpellSetup()
 		end
 
 		if (spellName) then
-			-- Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
-			-- Le rang suprieur est conservé
+			-- Pour les sorts avec des rangs numÃ©rotÃ©s, on compare pour chaque sort les rangs 1 Ã  1
+			-- Le rang suprieur est conservÃ©
 			if (string.find(subSpellName, ARCANUM_TRANSLATION.Rank)) then
 				local found = false;
 				local rank = tonumber(strsub(subSpellName, 6, strlen(subSpellName)));
@@ -1560,7 +1703,7 @@ function Arcanum_SpellSetup()
 						break ;
 					end
 				end
-				-- Les plus grands rangs de chacun des sorts à rang numérotés sont insérés dans la table
+				-- Les plus grands rangs de chacun des sorts Ã  rang numÃ©rotÃ©s sont insÃ©rÃ©s dans la table
 				if (not found) then
 					table.insert(CurrentSpells.ID, spellID);
 					table.insert(CurrentSpells.Name, spellName);
@@ -1624,11 +1767,11 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTION DE GESTION DES COMMANDES SLASH
+-- SLASH COMMAND MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
--- Gestion de la commande
+-- Managing the command
 function Arcanum_Slash(msg)
 	if msg == "options" then
 		if (ArcanumGeneralFrame:IsVisible()) then
@@ -1652,7 +1795,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTION DE GETION DE L'ICONE DE LA MINIMAP
+-- MINIMAP ICON MANAGEMENT FUNCTION
 
 ------------------------------------------------------------------------------------------------------
 
@@ -1671,7 +1814,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES BOUTONS DE L'UI
+-- UI BUTTON MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
@@ -1842,7 +1985,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES ICONES DE L'UI
+-- UI ICON MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
@@ -1858,11 +2001,24 @@ function Arcanum_LoadIconsV2()
 	ArcanumButton4Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[4 + ArcanumConfig.BuffType]);
 	OrderButton4Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[4 + ArcanumConfig.BuffType]);
 
-	ArcanumButton5Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[2 + ArcanumConfig.BuffType]);
-	OrderButton5Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[2 + ArcanumConfig.BuffType]);
+	-- Button 5: Hearthstone in solo mode, Portal: Karazhan in group mode
+	if ArcanumConfig.BuffType == 0 then
+		ArcanumButton5Texture:SetTexture(ArcanumButtonDisplayTexture[1]); -- Hearthstone texture
+		OrderButton5Texture:SetTexture(ArcanumButtonDisplayTexture[1]);
+	else
+		-- Use Undercity portal icon for Karazhan portal
+		ArcanumButton5Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[53] or ARCANUM_SPELL_TABLE.Texture[51]);
+		OrderButton5Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[53] or ARCANUM_SPELL_TABLE.Texture[51]);
+	end
 
-	ArcanumButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[6 + ArcanumConfig.BuffType]);
-	OrderButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[6 + ArcanumConfig.BuffType]);
+	-- Button 6: Teleport Alah'Thalas in solo mode, Portal Alah'Thalas in group mode
+	if ArcanumConfig.BuffType == 0 then
+		ArcanumButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[45]);
+		OrderButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[45]);
+	else
+		ArcanumButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[55]);
+		OrderButton6Texture:SetTexture(ARCANUM_SPELL_TABLE.Texture[55]);
+	end
 
 	if ArcanumConfig.BuffType == 0 then
 		for i = 41, 44 do
@@ -2070,11 +2226,11 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES COMPORTEMENTS DES BOUTONS DE L'UI
+-- UI BUTTON BEHAVIOR MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
--- Fonction (XML) pour rétablir les points d'attache par dfaut des boutons
+-- Function (XML) to restore default anchor points for buttons
 function Arcanum_ClearAllPoints()
 	ArcanumButton1:ClearAllPoints();
 	ArcanumButton2:ClearAllPoints();
@@ -2088,7 +2244,7 @@ function Arcanum_ClearAllPoints()
 	ArcanumButton10:ClearAllPoints();
 end
 
--- Fonction (XML) pour étendre la propriété NoDrag() du bouton principal d'Arcanum sur tous ses boutons
+-- Fonction (XML) pour Ã©tendre la propriÃ©tÃ© NoDrag() du bouton principal d'Arcanum sur tous ses boutons
 function Arcanum_NoDrag()
 	ArcanumButton1:RegisterForDrag("");
 	ArcanumButton2:RegisterForDrag("");
@@ -2196,11 +2352,11 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTIONS DE GESTION DES BOUTONS MENUS DE L'UI
+-- UI MENU BUTTON MANAGEMENT FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------
 
--- Gestion des casts du menu des buffs
+-- Managing casts from buff menu
 function Arcanum_BuffCast(type)
 	local TargetEnemy = false;
 	if (not (UnitIsFriend("player", "target"))) then
@@ -2235,9 +2391,9 @@ function Arcanum_BuffCast(type)
 end
 
 
--- Gestion des casts du menu des buffs
+-- Managing casts from armor menu
 function Arcanum_ArmorCast(type)
-	-- Si le mage possède l'armure de glace
+	-- Si le mage possÃ¨de l'armure de glace
 	if (ARCANUM_SPELL_TABLE.ID[type] ~= nil) then
 		CastSpell(ARCANUM_SPELL_TABLE.ID[type], "spell");
 		ArcanumConfig.LastArmor = type;
@@ -2250,7 +2406,7 @@ function Arcanum_ArmorCast(type)
 	AlphaArmorVar = GetTime() + 3;
 end
 
--- Gestion des casts du menu des buffs
+-- Managing casts from magic menu
 function Arcanum_MagicCast(type)
 	local TargetEnemy = false;
 	if (not (UnitIsFriend("player", "target"))) and type ~= 9 then
@@ -2287,7 +2443,7 @@ function Arcanum_MagicCast(type)
 	AlphaMagicVar = GetTime() + 3;
 end
 
--- Gestion des casts du menu des portails
+-- Managing casts from portal menu
 function Arcanum_PortalCast(type)
 	if (ARCANUM_SPELL_TABLE.ID[type] ~= nil) then
 		CastSpell(ARCANUM_SPELL_TABLE.ID[type], "spell");
@@ -2310,7 +2466,8 @@ function Arcanum_PortalCast(type)
 			end
 			TPMess = tempnum;
 			for i = 1, table.getn(ARCANUM_PORTAL_MESSAGES[tempnum]) do
-				Arcanum_Msg(Arcanum_MsgReplace(ARCANUM_PORTAL_MESSAGES[tempnum][i], ville), "WORLD");
+				-- Send as emote instead of chat message
+				SendChatMessage(Arcanum_MsgReplace(ARCANUM_PORTAL_MESSAGES[tempnum][i], ville), "EMOTE");
 			end
 		end
 	end
@@ -2318,7 +2475,7 @@ end
 
 ------------------------------------------------------------------------------------------------------
 
--- FONCTION DE GESTION DES COMBOBOX
+-- COMBOBOX MANAGEMENT FUNCTION
 
 ------------------------------------------------------------------------------------------------------
 
@@ -2428,7 +2585,7 @@ function Arcanum_Click(button)
 		ArcanumTradeNow = true;
 	elseif (button == 8) then
 		if (ArcanumConfig.BuffType == 0) then
-			--On passe de 'Solo' à 'en groupe'
+			--On passe de 'Solo' Ã  'en groupe'
 			if (ARCANUM_SPELL_TABLE.ID[3] ~= nil or ARCANUM_SPELL_TABLE.ID[5] ~= nil or ARCANUM_SPELL_TABLE.ID[7] ~= nil or ARCANUM_SPELL_TABLE.ID[20] ~= nil or ARCANUM_SPELL_TABLE.ID[21] ~= nil or ARCANUM_SPELL_TABLE.ID[22] ~= nil or ARCANUM_SPELL_TABLE.ID[23] ~= nil or ARCANUM_SPELL_TABLE.ID[24] ~= nil or ARCANUM_SPELL_TABLE.ID[25] ~= nil) then
 				ArcanumConfig.BuffType = 1;
 				Arcanum_Arcanum2ButtonSetup();
@@ -2436,7 +2593,7 @@ function Arcanum_Click(button)
 				Arcanum_EDIcons();
 			end
 		else
-			--On passe de 'en groupe' à 'Solo'
+			--On passe de 'en groupe' Ã  'Solo'
 			ArcanumConfig.BuffType = 0;
 			Arcanum_Arcanum2ButtonSetup();
 			Arcanum_LoadIconsV2();
@@ -2539,7 +2696,47 @@ function Arcanum_Cooldown()
 end
 
 function Arcanum_SpellManagement()
-
+	-- This is called when SPELLCAST_STOP fires (spell successfully completes)
+	-- Set cooldowns based on what spell was just cast
+	
+	-- Check if we just used Atiesh
+	if AtieshUsed then
+		AtieshCooldown = GetTime() + 60
+		AtieshUsed = false
+	end
+	
+	if not SpellCastName then
+		return
+	end
+	
+	-- Check for portal/teleport spells and set 60-second cooldowns
+	-- Map spell names to button indices
+	local portalMap = {
+		["Teleport: Darnassus"] = 1,
+		["Teleport: Ironforge"] = 2,
+		["Teleport: Stormwind"] = 3,
+		["Teleport: Theramore"] = 4,
+		["Teleport: Alah'Thalas"] = 5,
+		["Teleport: Orgrimmar"] = 1,
+		["Teleport: Thunder Bluff"] = 2,
+		["Teleport: Undercity"] = 3,
+		["Teleport: Stonard"] = 4,
+		["Portal: Darnassus"] = 1,
+		["Portal: Ironforge"] = 2,
+		["Portal: Stormwind"] = 3,
+		["Portal: Theramore"] = 4,
+		["Portal: Alah'Thalas"] = 5,
+		["Portal: Orgrimmar"] = 1,
+		["Portal: Thunder Bluff"] = 2,
+		["Portal: Undercity"] = 3,
+		["Portal: Stonard"] = 4,
+	}
+	
+	local buttonIndex = portalMap[SpellCastName]
+	if buttonIndex and buttonIndex <= 4 then
+		-- Set 60 second cooldown for portal buttons 7, 8, 9, 10
+		PortalCooldown[buttonIndex] = GetTime() + 60
+	end
 end
 
 function Arcanum_SelectButtonOrder(Id)
@@ -2828,4 +3025,3 @@ function Arcanum_ButtonColorClick()
 	ColorPickerFrame:SetColorRGB(color.r, color.g, color.b);
 	ColorPickerFrame:Show();
 end
-

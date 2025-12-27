@@ -1,5 +1,5 @@
-﻿ArcanumData = {};
-ArcanumData.Version = "0.102";
-ArcanumData.Author = "Nausicaa on Medivh FR + Pepopo";
+ArcanumData = {};
+ArcanumData.Version = "1.1";
+ArcanumData.Author = "Nausicaa";
 ArcanumData.AppName = "Arcanum";
-ArcanumData.Label = ArcanumData.AppName.." "..ArcanumData.Version.." by "..ArcanumData.Author;
+ArcanumData.Label = ArcanumData.AppName.." V"..ArcanumData.Version.." by "..ArcanumData.Author..", updated by Fayz";

@@ -149,7 +149,9 @@ local PlayerZone = nil;
 local playerClass, englishClass = nil;
 
 local TPMess = 0;
+local TPMessTime = 0; -- Track when last portal message was sent
 local OrangeMess = 0; -- Track last orange message to avoid repeats
+local OrangeMessTime = 0; -- Track when last orange message was sent
 local RandMount = 0;
 
 -- Menus: Allows display of buff menus...
@@ -1538,13 +1540,15 @@ function Arcanum_UseItem(type, button)
 		if (type == "Food") then
 			if (button == "RightButton") then
 				if ArcanumConfig.BuffType == 1 and ARCANUM_SPELL_TABLE.ID[35] ~= nil then
-					if ArcanumConfig.OrangesMessage then
+					if ArcanumConfig.OrangesMessage and (GetTime() - OrangeMessTime) > 3 then
+						-- Only send emote if 3 seconds have passed since last one
 						-- Select random orange message (avoid repeating last one)
 						local tempnum = random(1, table.getn(ARCANUM_ORANGE_MESSAGES));
 						while tempnum == OrangeMess and table.getn(ARCANUM_ORANGE_MESSAGES) >= 2 do
 							tempnum = random(1, table.getn(ARCANUM_ORANGE_MESSAGES));
 						end
 						OrangeMess = tempnum;
+						OrangeMessTime = GetTime(); -- Update timestamp
 						-- Send as emote
 						for i = 1, table.getn(ARCANUM_ORANGE_MESSAGES[tempnum]) do
 							SendChatMessage(ARCANUM_ORANGE_MESSAGES[tempnum][i], "EMOTE");
@@ -2459,12 +2463,14 @@ function Arcanum_PortalCast(type)
 		AlphaPortalMenu = 1;
 		AlphaPortalVar = GetTime() + 3;
 
-		if ArcanumConfig.PortalMessage == true and type >= 20 then
+		if ArcanumConfig.PortalMessage == true and type >= 20 and (GetTime() - TPMessTime) > 3 then
+			-- Only send emote if 3 seconds have passed since last one
 			local tempnum = random(1, table.getn(ARCANUM_PORTAL_MESSAGES));
 			while tempnum == TPMess and table.getn(ARCANUM_PORTAL_MESSAGES) >= 2 do
 				tempnum = random(1, table.getn(ARCANUM_PORTAL_MESSAGES));
 			end
 			TPMess = tempnum;
+			TPMessTime = GetTime(); -- Update timestamp
 			for i = 1, table.getn(ARCANUM_PORTAL_MESSAGES[tempnum]) do
 				-- Send as emote instead of chat message
 				SendChatMessage(Arcanum_MsgReplace(ARCANUM_PORTAL_MESSAGES[tempnum][i], ville), "EMOTE");
